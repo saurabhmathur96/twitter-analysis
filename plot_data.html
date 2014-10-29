@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Data Plot</title>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<style type="text/css">
+
+			rect:hover {
+				fill: orange;
+			}
+
+		</style>
+	</head>
+	<body>
+	    <p><em>Click on bars to sort. Hover to get value</em></p>
+		<script type="text/javascript">
+		d3.text("datafile.csv", function(text) { 
+			//Width and height
+			var w = 600;
+			var h = 250;
+			var data= d3.csv.parseRows(text);
+			dataset = data[1].map(Number);
+			tags = data[0];
+			
+
+			var xScale = d3.scale.ordinal()
+							.domain(d3.range(dataset.length))
+							.rangeRoundBands([0, w], 0.05);
+
+			var yScale = d3.scale.linear()
+							.domain([0, d3.max(dataset)])
+							.range([0, h]);
+			
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+			//Create bars
+			svg.selectAll("rect")
+			   .data(dataset)
+			   .enter()
+			   .append("rect")
+			   .attr("x", function(d, i) {
+			   		return xScale(i);
+			   })
+			   .attr("y", function(d) {
+			   		return h - yScale(d);
+			   })
+			   .attr("width", xScale.rangeBand())
+			   .attr("height", function(d) {
+			   		return yScale(d);
+			   })
+			   .attr("fill", function(d) {
+					return "rgb(0, 0, " + (d * 30) + ")";
+			   })
+			   .on("click", function() {
+			   		sortBars();
+			   })
+			   .append("title")
+			   .text(function(d,e) {
+			   		return tags[e] +" : " + d;
+			   });
+
+			//Define sort order flag
+			var sortOrder = false;
+			
+			//Define sort function
+			var sortBars = function() {
+
+				//Flip value of sortOrder
+			   	sortOrder = !sortOrder;
+
+				svg.selectAll("rect")
+				   .sort(function(a, b) {
+				   		if (sortOrder) {
+					   		return d3.ascending(a, b);
+				   		} else {
+					   		return d3.descending(a, b);
+				   		}
+				   	})
+				   .transition()
+				   .delay(function(d, i) {
+					   return i * 50;
+				   })
+				   .duration(1000)
+				   .attr("x", function(d, i) {
+				   		return xScale(i);
+				   });
+
+			};	
+			});			
+		</script>
+	</body>
+</html>
