@@ -50,17 +50,18 @@ def main():
     
     if len(sys.argv) != 2:
         print 'error: usage python analyze.py [topic]'
-    topic = sys.argv[1]
-    
-    csl = CustomStreamListener()
-    try:
-        auth = get_api()
-        streaming_api = tweepy.Stream(auth, csl)
-        streaming_api.filter(track=[topic])
-    except KeyboardInterrupt:
-        print '-'*4 + 'TOTAL TWEETS' + '-'*4
-        print csl.count
-        print '-'*20
-        write_dict_to_csv(csl.freq)
+    else:
+        topic = sys.argv[1]
+        
+        csl = CustomStreamListener()
+        try:
+            auth = get_api()
+            streaming_api = tweepy.Stream(auth, csl)
+            streaming_api.filter(track=[topic])
+        except KeyboardInterrupt:
+            print '-'*4 + 'TOTAL TWEETS' + '-'*4
+            print csl.count
+            print '-'*20
+            write_dict_to_csv(csl.freq)
 if __name__ == "__main__":
     main()
